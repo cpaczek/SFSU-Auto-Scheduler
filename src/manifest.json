@@ -6,8 +6,9 @@
   "default_locale": "en",
   "permissions": [
     "activeTab",
-    "<all_urls>",
-    "*://*/*"
+    "tabs",
+    "https://*.sfsu.edu/*",
+    "storage"
   ],
   "icons": {
     "16": "icons/16.png",
@@ -20,6 +21,13 @@
     ],
     "persistent": false
   },
+  "content_scripts": [
+    {
+      "matches": ["https://webapps.sfsu.edu/public/classservices/classsearch/results"],
+      "js": ["js/content-script.js"],
+      "css": ["css/styles.css"]
+    }
+  ],
   "browser_action": {
     "default_popup": "popup.html",
     "default_title": "__MSG_extName__",
@@ -27,12 +35,5 @@
       "19": "icons/19.png",
       "38": "icons/38.png"
     }
-  },
-  "options_ui": {
-    "page": "options.html",
-    "browser_style": true
-  },
-  "chrome_url_overrides": {
-    "newtab": "override.html"
   }
 }

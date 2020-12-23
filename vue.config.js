@@ -6,16 +6,6 @@ module.exports = {
       entry: './src/popup/main.js',
       title: 'Popup'
     },
-    options: {
-      template: 'public/browser-extension.html',
-      entry: './src/options/main.js',
-      title: 'Options'
-    },
-    override: {
-      template: 'public/browser-extension.html',
-      entry: './src/override/main.js',
-      title: 'Override'
-    },
     standalone: {
       template: 'public/browser-extension.html',
       entry: './src/standalone/main.js',
@@ -35,6 +25,13 @@ module.exports = {
               'src/content-scripts/content-script.js'
             ]
           }
+        },
+        manifestTransformer: (manifest) => {
+          if (process.env.NODE_ENV === 'development') {
+            manifest.content_security_policy = manifest.content_security_policy.replace('script-src', 'script-src http://localhost:8098');
+          }
+
+          return manifest;
         }
       }
     }

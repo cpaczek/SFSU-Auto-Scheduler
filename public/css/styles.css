@@ -1,0 +1,21 @@
+a.sfsu-scheduler_add_class{
+    color: white !important;
+    padding: 10px;
+    background: #6d6dee;
+    border-radius: 10px;
+    font-size: .75em;
+}
+a.sfsu-scheduler_added_class{
+    color: white !important;
+    padding: 10px;
+    background: #22b500;
+    border-radius: 10px;
+    font-size: .75em;
+}
+a.sfsu-scheduler_add_class:hover{
+    cursor:pointer;
+}
+.sorting_1{
+    display: flex;
+    flex-direction: column;
+}
