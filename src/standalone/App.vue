@@ -114,7 +114,6 @@ export default {
     async sortClasses() {
       this.courseNames = [];
       let temp = await browser.storage.local.get(['classes'])
-      console.log(temp)
       this.classes = temp.classes;
       this.classes.forEach((e) => {
         let splitName = e.name.split('[')[0]
@@ -128,14 +127,12 @@ export default {
       });
 
       Object.keys(this.sortedClasses).forEach((i) => {
-        console.log("i")
         this.classes.forEach((e) => {
           if (i === e.name.split('[')[0]) {
             this.sortedClasses[i].push(e)
           }
         })
       })
-      console.log(this.sortedClasses)
     },
     async removeClass(className){
       let temp = await browser.storage.local.get(['classes'])
@@ -149,8 +146,6 @@ export default {
       return Object.keys(test)[0];
     },
     getRMPScore(first, last) {
-      // console.log("RMP")
-      // console.log(rmpdb)
       let score = rmpdb.find(e => (e.teacherfirstname_t === first && e.teacherlastname_t === last));
       return score.averageratingscore_rf;
     },
@@ -164,13 +159,11 @@ export default {
         let y = new Array(class_obj)
         this.seeIfSheFits(y, null, x)
       }
-      console.log(this.slider + "slider")
       let tempSchedule = JSON.parse(JSON.stringify(this.createdSchedule))
       tempSchedule.forEach((e) => {
         e["start_time"] = this.scheduleEarliestTime(e)
         e["average_score"] = this.scheduleScore(e)
       })
-      console.log(tempSchedule)
 
       if (!this.slider) {
         //score
@@ -181,7 +174,6 @@ export default {
         //afternoon class
         tempSchedule.sort((a, b) => (a.start_time < b.start_time) ? 1 : (a.start_time === b.start_time) ?
             ((a.average_score < b.average_score) ? 1 : -1) : -1)
-        console.log("afternoon class")
       }
       this.createdSchedule = tempSchedule;
 
@@ -196,8 +188,6 @@ export default {
       for (let current_course of y) {
 
         if (checkCourse && this.conflicts(checkCourse, current_course)) { // For doing
-          console.log("confict" + checkCourse.name)
-          console.log("confict" + current_course.name)
           return;
         }
       }
@@ -208,10 +198,6 @@ export default {
 
 
       if (!available_courses || available_courses === {} || Object.keys(available_courses).length < 1) {
-        /*console.log("Completed with the values")
-        console.log(available_courses_cp)
-        console.log("Current Track")
-        console.log(current_track)*/
         console.warn(y)
         this.createdSchedule.push(y)
 
@@ -219,14 +205,9 @@ export default {
       }
 
       const rescurse_course = Object.keys(available_courses)[0];
-      console.log("Deleing course " + rescurse_course)
       let x = {...available_courses};
       delete x[rescurse_course]
-      console.log("Is it really deleted tho?")
-      console.log(x)
       for (const course of available_courses[rescurse_course]) {
-        console.log("Iteration motherfucker")
-        console.log(course)
 
         this.seeIfSheFits(y, course, x);
       }
@@ -242,10 +223,6 @@ export default {
         for (let j of secondCourseDays) {
           if (i === j) {
             if ((firstCourseTimes[0] <= secondCourseTimes[1]) && (secondCourseTimes[0] <= firstCourseTimes[1])) {
-              console.log("courses");
-              console.log(firstCourseTimes);
-              console.log(secondCourseTimes);
-              console.warn("conflicttime")
               return true;
             }
           }
