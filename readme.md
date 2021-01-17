@@ -10,7 +10,7 @@ CSC 220, MATH 227, PHYS 220, PHYS 222, Area A, Area E
 After you search for these courses you will be presented with 50-100 classes depending on what GEs you pick, and it is very difficult to figure out which times works best for you and which teachers are good or not
 
 Here is an example of what I did before I made this extension
-![Spreadsheet of classes](https://i.gyazo.com/1132ef46e379832016ec17d00a515278.png)
+![Spreadsheet of classes](https://raw.githubusercontent.com/Cpaczek/SFSU-Auto-Scheduler/master/readme/1132ef46e379832016ec17d00a515278.png)
 This had all the classes that I considered acceptable. My criteria was that they should have a ratemyprofessor score >= 3 and not have a class that was too early after I filtered the list it left me with ~30 classes to figure out how to put it together.
 This process overall takes about 1-3 hours depending on the complexity of your classes and you are still not able to be confident that you made the best schedule for you self.
 
@@ -19,16 +19,16 @@ First install the chrome extension via the instruction below (coming to chrome w
 
 Next go to https://www.sfsu.edu/online/clssch.htm and type in that course that you need to take, for example CSC 413
 After the search is complete you will be greeted with a new button added by the extension
-![Course Lookup](https://i.gyazo.com/f309a7ebc954ee8afa222dfcb5248690.png)
+![Course Lookup](https://raw.githubusercontent.com/Cpaczek/SFSU-Auto-Scheduler/master/readme/f309a7ebc954ee8afa222dfcb5248690.png)
 Simply click the button to add the class to the extension.
 **You are unable to remove classes from this screen if you added a class on accident you need to do this from the scheduling page by clicking on the extension icon.** 
 After you have done this with all of your courses click the extension icon in the upper right and click "Go To Scheduler"
-![Extension popup](https://i.gyazo.com/5c2d36da09b5f54ae397993af0629a59.png)
+![Extension popup](https://raw.githubusercontent.com/Cpaczek/SFSU-Auto-Scheduler/master/readme/5c2d36da09b5f54ae397993af0629a59.png)
 From here you can view all of the classes that you selected and whether you want to prioitize the RMP Score or Having afternoon classes
 **In the event of a tie (i.e 2 professors have a score of 4) the algo will select the class that occurs later in the day**
 Options to prioritize early morning classes is coming soon.
 After you generate your schedule you will get 5 optimal schedules that you can choose from.
-![Generated Schedule](https://i.gyazo.com/009377f25d2e5bfd5733a63ecf4b3506.png)
+![Generated Schedule](https://raw.githubusercontent.com/Cpaczek/SFSU-Auto-Scheduler/master/readme/009377f25d2e5bfd5733a63ecf4b3506.png)
 
 # Todo
 - [ ] Add support for Bi-sync classes
