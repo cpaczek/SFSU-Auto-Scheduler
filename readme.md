@@ -31,11 +31,11 @@ After you generate your schedule you will get 5 optimal schedules that you can c
 ![Generated Schedule](https://raw.githubusercontent.com/Cpaczek/SFSU-Auto-Scheduler/master/readme/009377f25d2e5bfd5733a63ecf4b3506.png)
 
 # Todo
-- [ ] Add support for Bi-sync classes
-- [ ] Add support for Async classes
-- [ ] Add support to prioritize early classes
+- [ ] Add support for Bi-sync classes (this may work already)
+- [x] Add support for Async classes
+- [x] Add support to prioritize early classes
 - [ ] Restyle UI
-- [ ] Take an algorithms class and figure out how to increase efficiency of scheduling algorithm 
+- [ ] Take an algorithms class and figure out how to increase efficiency of scheduling algorithm (nope)
 
 # Build/Run Instructions
 ## Build Instructions

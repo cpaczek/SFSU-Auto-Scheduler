@@ -1,13 +1,15 @@
 <template>
   <div>
-    <h1>Selected Classes</h1>
-    <div v-if="courseNames">
+    <h1 v-if="courseNames.length !== 0">Selected Classes</h1>
+    <h1 v-else>You have no selected classes Navigate to <a
+        href="https://webapps.sfsu.edu/public/classservices/classsearch">here</a> and search for your class</h1>
+    <div v-if="courseNames.length !== 0">
 
       <div class="col">
         <div class="tabs">
-          <div class="tab" v-for="(classes1, key) in sortedClasses" :key="classes1.name">
-            <input type="checkbox" :id="key">
-            <label class="tab-label" :for="key">{{ key }}</label>
+          <div v-for="(classes1, key) in sortedClasses" :key="classes1.name" class="tab">
+            <input :id="key" type="checkbox">
+            <label :for="key" class="tab-label">{{ key }}</label>
             <div class="tab-content">
               <table>
                 <thead>
@@ -30,7 +32,9 @@
                   </td>
                   <td>{{ classes2.time }}</td>
                   <td>{{ classes2.days }}</td>
-                  <td><button class="button-danger" @click="removeClass(classes2.name)">Remove</button></td>
+                  <td>
+                    <button class="button-danger" @click="removeClass(classes2.name)">Remove</button>
+                  </td>
                 </tr>
                 </tbody>
                 <br>
@@ -46,52 +50,75 @@
     <br>
     <br>
     <!--    left is false right is true-->
-    <div class="flex slider-cont">
-      <p :class="{ bold: !slider  }">Prioritize Score</p>
-      <label class="switch" for="checkbox">
-        <input v-model="slider" type="checkbox" id="checkbox"/>
-        <div class="slider round"></div>
-      </label>
-      <p :class="{ bold: slider  }">Prioritize Afternoon Classes</p>
+    <div v-if="courseNames.length !== 0">
+      <p>I prefer to have</p><br>
+      <div class="container">
+        <form>
+          <label>
+            <input v-model="classTimePreference" name="radio" type="radio" value="true"/>
+            <span>Morning Classes</span>
+          </label>
+          <label>
+            <input v-model="classTimePreference" name="radio" type="radio" value="false"/>
+            <span>Afternoon Classes</span>
+          </label>
+        </form>
+        <p>Give Priority to Rate My Professor Score</p>
+        <form>
+          <label>
+            <input v-model="rmpPreference" name="radio" type="radio" value="true"/>
+            <span>Yes</span>
+          </label>
+          <label>
+            <input v-model="rmpPreference" name="radio" type="radio" value="false"/>
+            <span>No</span>
+          </label>
+        </form>
+
+        <br>
+        <button v-if="!generating" class="button-primary" @click="createSchedule()">Generate Schedule</button>
+        <button v-else class="button-primary">Generating</button>
+        <h1>Suitable Options</h1>
+        <p>Because there are a thousands sometimes hundreds of thousands of possible combinations we provide the top 5
+          compatible course schedule for you to choose from.</p>
+        <table v-for="courses in createdSchedule" :key="courses.name">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Professor</th>
+            <th>Class Number</th>
+            <th>Score</th>
+            <th>Time</th>
+            <th>Days</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="class_obj in courses" :key="class_obj.name">
+            <td>{{ class_obj.name }}</td>
+            <td>{{ class_obj.prof }}</td>
+            <td>{{ class_obj.classNumber }}</td>
+            <td>{{
+                getRMPScore(class_obj.prof.substr(0, class_obj.prof.indexOf(' ')), class_obj.prof.substr(class_obj.prof.indexOf(' ') + 1))
+              }}
+            </td>
+            <td v-if="class_obj.classType.includes('Asynchronous')">Async Class</td>
+            <td v-else>{{ class_obj.time }}</td>
+            <td>{{ class_obj.days }}</td>
+
+          </tr>
+          </tbody>
+          <br>
+          <br>
+          <br>
+        </table>
+      </div>
     </div>
-
-    <br>
-    <button class="button-primary" @click="createSchedule()">Generate Schedule</button>
-    <h1>Suitable Options</h1>
-    <p>Because there are a thousands sometimes hundreds of thousands of possible combinations we provide the top 5
-      compatible course schedule for you to choose from.</p>
-    <table v-for="courses in createdSchedule" :key="courses.name">
-      <thead>
-      <tr>
-        <th>Name</th>
-        <th>Professor</th>
-        <th>Score</th>
-        <th>Time</th>
-        <th>Days</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for="class_obj in courses" :key="class_obj.name">
-        <td>{{ class_obj.name }}</td>
-        <td>{{ class_obj.prof }}</td>
-        <td>{{
-            getRMPScore(class_obj.prof.substr(0, class_obj.prof.indexOf(' ')), class_obj.prof.substr(class_obj.prof.indexOf(' ') + 1))
-          }}
-        </td>
-        <td>{{ class_obj.time }}</td>
-        <td>{{ class_obj.days }}</td>
-
-      </tr>
-      </tbody>
-      <br>
-      <br>
-      <br>
-    </table>
   </div>
 </template>
 
 <script>
 import {rmpdb} from '../assets/rmp.js'
+import {sort} from 'fast-sort';
 
 export default {
 
@@ -103,7 +130,9 @@ export default {
       courseNames: [],
       sortedClasses: {},
       createdSchedule: [],
-      slider: false,
+      classTimePreference: "false",
+      rmpPreference: "false",
+      generating: false,
 
     }
   },
@@ -111,30 +140,41 @@ export default {
     await this.sortClasses()
   },
   methods: {
+    //parses cources from storage into easier json
     async sortClasses() {
       this.courseNames = [];
       let temp = await browser.storage.local.get(['classes'])
+      console.log(temp)
+
       this.classes = temp.classes;
+
       this.classes.forEach((e) => {
+        //Class name wihtout suffix i.e csc413 instead of csc 413[01]
         let splitName = e.name.split('[')[0]
+        //if we don't have this course yet add it to coursenames
         if (!this.courseNames.includes(splitName)) {
           this.courseNames.push(splitName)
         }
       })
-
+      // for each course add an index to sorted classes
       this.courseNames.forEach((e) => {
         this.sortedClasses[e] = []
       });
-
+      // for each course name
       Object.keys(this.sortedClasses).forEach((i) => {
+        //for each class (i.e csc413[01] not just csc413)
+        console.log("classes")
+        console.log(this.classes)
         this.classes.forEach((e) => {
+          //if the class belongs in a specific course
           if (i === e.name.split('[')[0]) {
+            //add it to the sorted classes
             this.sortedClasses[i].push(e)
           }
         })
       })
     },
-    async removeClass(className){
+    async removeClass(className) {
       let temp = await browser.storage.local.get(['classes'])
       let result = temp.classes.filter(name => name.name !== className)
       await browser.storage.local.set({
@@ -147,40 +187,113 @@ export default {
     },
     getRMPScore(first, last) {
       let score = rmpdb.find(e => (e.teacherfirstname_t === first && e.teacherlastname_t === last));
+      if (!score) {
+        return 2.5
+      }
       return score.averageratingscore_rf;
     },
     createSchedule() {
+      if (this.generating === true) {
+        return;
+      }
+      this.createdSchedule = [];
+      console.log("created")
+      console.log(JSON.stringify(this.createdSchedule))
+
+      this.generating = true;
       const copied_classes = JSON.parse(JSON.stringify(this.sortedClasses));
+
       const class_key = Object.keys(copied_classes)[0];
 
       for (const class_obj of copied_classes[class_key]) {
+
         let x = {...copied_classes};
         delete x[class_key];
         let y = new Array(class_obj)
-        this.seeIfSheFits(y, null, x)
+        this.checkForConflict(y, null, x)
       }
-      let tempSchedule = JSON.parse(JSON.stringify(this.createdSchedule))
+
+      this.createdSchedule = this.rankSchedules(this.createdSchedule);
+
+      this.createdSchedule = this.createdSchedule.slice(0, 5);
+      console.log(this.createdSchedule)
+      this.generating = false;
+    },
+    rankSchedules(createdSchedule) {
+      let tempSchedule = JSON.parse(JSON.stringify(createdSchedule))
+      console.log(tempSchedule)
+      //Morning class
       tempSchedule.forEach((e) => {
         e["start_time"] = this.scheduleEarliestTime(e)
         e["average_score"] = this.scheduleScore(e)
+        e["time_score"] = this.scheduleTimeScore(e)
       })
+      let sorted;
+      if (this.classTimePreference === "true") {
+        console.log("morning class")
+        //Morningn Class
+        if (this.rmpPreference === "true") {
+          console.log("prefers rmp")
+          sorted = sort(tempSchedule).by([
+            {desc: u => u.average_score},
+            {asc: u => u.time_score},
+            {asc: u => u.start_time},
 
-      if (!this.slider) {
-        //score
-        tempSchedule.sort((a, b) =>
-            (a.average_score < b.average_score ? 1 : (a.average_score === b.average_score) ?
-                ((a.start_time > b.start_time) ? 1 : -1) : -1));
+          ]);
+        } else {
+          sorted = sort(tempSchedule).by([
+            {asc: u => u.time_score},
+            {asc: u => u.start_time},
+            {desc: u => u.average_score}
+          ]);
+        }
       } else {
+        if (this.rmpPreference === "true") {
+          sorted = sort(tempSchedule).by([
+            {desc: u => u.average_score},
+            {desc: u => u.start_time},
+            {desc: u => u.time_score},
+          ]);
+        }
         //afternoon class
-        tempSchedule.sort((a, b) => (a.start_time < b.start_time) ? 1 : (a.start_time === b.start_time) ?
-            ((a.average_score < b.average_score) ? 1 : -1) : -1)
+        sorted = sort(tempSchedule).by([
+          {desc: u => u.start_time},
+          {desc: u => u.time_score},
+          {desc: u => u.average_score}
+        ]);
       }
-      this.createdSchedule = tempSchedule;
 
-      this.createdSchedule = this.createdSchedule.slice(0, 5);
-
+      return sorted;
     },
-    seeIfSheFits(current_track, checkCourse, available_courses) {
+    scheduleTimeScore(schedule) {
+      let timeScore = 0;
+      let classAmount = 0
+
+      schedule.forEach((e) => {
+        if (e.classType.includes("Asynchronous")) {
+          return;
+        }
+        timeScore += this.parseTime(e.time)[0];
+        classAmount++;
+
+      })
+      return timeScore / classAmount
+    },
+    scheduleEarliestTime(schedule) {
+      let earliest = 24;
+
+      schedule.forEach((e) => {
+        if (e.classType.includes("Asynchronous")) {
+          return;
+        }
+        let temptime = this.parseTime(e.time)
+        if (temptime[0] < earliest) {
+          earliest = temptime[0]
+        }
+      })
+      return earliest
+    },
+    checkForConflict(current_track, checkCourse, available_courses) {
 
       let y = current_track.map((x) => x)
 
@@ -193,12 +306,12 @@ export default {
       }
 
       if (checkCourse) {
+
         y.push(checkCourse);
       }
 
 
       if (!available_courses || available_courses === {} || Object.keys(available_courses).length < 1) {
-        console.warn(y)
         this.createdSchedule.push(y)
 
         return;
@@ -209,12 +322,15 @@ export default {
       delete x[rescurse_course]
       for (const course of available_courses[rescurse_course]) {
 
-        this.seeIfSheFits(y, course, x);
+        this.checkForConflict(y, course, x);
       }
 
 
     },
     conflicts(firstCourse, secondCourse) {
+      if (firstCourse.classType.includes("Asynchronous") || secondCourse.classType.includes("Asynchronous")) {
+        return false;
+      }
       let firstCourseDays = firstCourse.days.split(" ")
       let firstCourseTimes = this.parseTime(firstCourse.time)
       let secondCourseDays = secondCourse.days.split(" ")
@@ -230,6 +346,7 @@ export default {
       }
       return false;
     },
+    //Returns the overall average score of a schedule
     scheduleScore(schedule) {
       let total = 0;
       schedule.forEach((e) => {
@@ -238,17 +355,7 @@ export default {
       })
       return total / schedule.length
     },
-    scheduleEarliestTime(schedule) {
-      let earliest = 24;
 
-      schedule.forEach((e) => {
-        let temptime = this.parseTime(e.time)
-        if (temptime[0] < earliest) {
-          earliest = temptime[0]
-        }
-      })
-      return earliest
-    },
     parseTime(times) {
       let parsedTimes = []
       let time = times.split(" - ");
@@ -307,65 +414,13 @@ tr:nth-child(even) {
   color: white;
 
 }
+
 .button-danger {
   padding: 10px;
   border: 50px;
   background-color: #ff0000;
   color: white;
 
-}
-
-.slider {
-  background-color: #ccc;
-  bottom: 0;
-  cursor: pointer;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  transition: .4s;
-}
-
-.slider:before {
-  background-color: #fff;
-  bottom: 4px;
-  content: "";
-  height: 16px;
-  left: 4px;
-  position: absolute;
-  transition: .4s;
-  width: 16px;
-}
-
-input + .slider {
-  background-color: #2594ff;
-}
-
-input:checked + .slider:before {
-  transform: translateX(26px);
-}
-
-.slider.round {
-  border-radius: 34px;
-}
-
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
-.flex {
-  display: flex;
-}
-
-.slider-cont {
-  flex-flow: nowrap;
-
-}
-
-.slider-cont > p,
-.slider-cont > p {
-  margin: auto 10px;
 }
 
 input {
@@ -462,5 +517,70 @@ input:checked + .tab-label::after {
 input:checked ~ .tab-content {
   max-height: 100vh;
   padding: 1em;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+label {
+  display: flex;
+  cursor: pointer;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0.375em;
+  /* Accessible outline */
+  /* Remove comment to use */
+  /*
+  	&:focus-within {
+  			outline: .125em solid $primary-color;
+  	}
+  */
+}
+
+label input {
+  position: absolute;
+  left: -9999px;
+}
+
+label input:checked + span {
+  background-color: #d6d6e5;
+}
+
+label input:checked + span:before {
+  box-shadow: inset 0 0 0 0.4375em #00005c;
+}
+
+label span {
+  display: flex;
+  align-items: center;
+  padding: 0.375em 0.75em 0.375em 0.375em;
+  border-radius: 99em;
+  transition: 0.25s ease;
+}
+
+label span:hover {
+  background-color: #d6d6e5;
+}
+
+label span:before {
+  display: flex;
+  flex-shrink: 0;
+  content: "";
+  background-color: #fff;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  margin-right: 0.375em;
+  transition: 0.25s ease;
+  box-shadow: inset 0 0 0 0.125em #00005c;
+}
+
+.container {
+  display: flex;
+  flex-flow: wrap column;
 }
 </style>

@@ -2,12 +2,11 @@
   "manifest_version": 2,
   "name": "__MSG_extName__",
   "homepage_url": "http://localhost:8080/",
-  "description": "A Vue Browser Extension",
+  "description": "An easier more efficient way to pick classes for SFSU. Report bugs https://github.com/Cpaczek/SFSU-Auto-Scheduler/issues",
   "default_locale": "en",
   "permissions": [
     "activeTab",
-    "tabs",
-    "https://*.sfsu.edu/*",
+    "https://webapps.sfsu.edu/public/classservices/classsearch/results",
     "storage"
   ],
   "icons": {

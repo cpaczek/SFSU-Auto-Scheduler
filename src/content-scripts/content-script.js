@@ -1,4 +1,3 @@
-console.log("test")
 var checkExist = setInterval(function () {
     if (document.getElementsByClassName('sorting_1').length) {
         console.log("Exists!");
@@ -12,11 +11,10 @@ async function addClassToScheduler(row) {
     let name = row.childNodes[0].childNodes[0].innerText;
     let days = row.childNodes[7].childNodes[0].childNodes[0].innerText
     let time = row.childNodes[7].childNodes[0].childNodes[1].innerText
+    let classType = row.childNodes[7].childNodes[0].lastChild.innerText
+    let classNumber = row.childNodes[4].innerText
     let prof = row.childNodes[8].childNodes[0].innerText
-    console.log(days)
-    console.log(name)
-    console.log(time)
-    console.log(prof)
+    console.log("Type" + classType)
 let classes = await browser.storage.local.get(['classes'])
     if(!(classes.classes)){
         console.log("settgings")
@@ -26,7 +24,9 @@ let classes = await browser.storage.local.get(['classes'])
                     days,
                     name,
                     time,
-                    prof
+                    prof,
+                    classNumber,
+                    classType
                 }
             ]
         })
@@ -37,7 +37,9 @@ let classes = await browser.storage.local.get(['classes'])
             days,
             name,
             time,
-            prof
+            prof,
+            classNumber,
+            classType
         })
         browser.storage.local.set({
             classes: classes.classes

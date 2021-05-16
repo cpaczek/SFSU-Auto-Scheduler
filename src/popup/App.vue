@@ -3,7 +3,7 @@
     <h1>SFSU Scheduler</h1>
     <a class="button-primary" target="_blank" href="/index.html">Go To Scheduler</a><br>
     <a class="button-primary" @click="clearStorage()">Clear Current Selections</a>
-    <p>Created by Cameron Paczek</p>
+    <p>Created by <a href="https://github.com/cpaczek" target="_blank">Cameron Paczek</a></p>
   </div>
 </template>
 
