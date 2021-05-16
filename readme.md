@@ -1,4 +1,4 @@
-### :warning: this app in currently in beta and does not support Async or Bi-sync classes
+### :warning: this app in currently in beta and does not fully support Bi-sync classes (they may work though)
 # SFSU Auto Scheduler
 This is a multi-platform web extension that allows students at San Francisco State University to easily figure out what is the best class to pick.
 
