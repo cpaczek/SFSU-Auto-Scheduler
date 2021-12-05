@@ -9,9 +9,9 @@ var checkExist = setInterval(function () {
 async function addClassToScheduler(row) {
     console.log(row)
     let name = row.childNodes[0].childNodes[0].innerText;
-    let days = row.childNodes[7].childNodes[0].childNodes[0].innerText
-    let time = row.childNodes[7].childNodes[0].childNodes[1].innerText
-    let classType = row.childNodes[7].childNodes[0].lastChild.innerText
+    let days = row.childNodes[6].childNodes[0].childNodes[0].innerText
+    let time = row.childNodes[6].childNodes[0].childNodes[1].innerText
+    let classType = row.childNodes[7].innerText.split('\n')[0]
     let classNumber = row.childNodes[4].innerText
     let prof = row.childNodes[8].childNodes[0].innerText
     console.log("Type" + classType)

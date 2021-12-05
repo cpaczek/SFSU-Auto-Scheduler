@@ -86,6 +86,7 @@
           <tr>
             <th>Name</th>
             <th>Professor</th>
+            <th>Class Type</th>
             <th>Class Number</th>
             <th>Score</th>
             <th>Time</th>
@@ -96,6 +97,7 @@
           <tr v-for="class_obj in courses" :key="class_obj.name">
             <td>{{ class_obj.name }}</td>
             <td>{{ class_obj.prof }}</td>
+            <td>{{ class_obj.classType }}</td>
             <td>{{ class_obj.classNumber }}</td>
             <td>{{
                 getRMPScore(class_obj.prof.substr(0, class_obj.prof.indexOf(' ')), class_obj.prof.substr(class_obj.prof.indexOf(' ') + 1))

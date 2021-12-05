@@ -5,7 +5,6 @@
   "description": "An easier more efficient way to pick classes for SFSU. Report bugs https://github.com/Cpaczek/SFSU-Auto-Scheduler/issues",
   "default_locale": "en",
   "permissions": [
-    "activeTab",
     "https://webapps.sfsu.edu/public/classservices/classsearch/results",
     "storage"
   ],
