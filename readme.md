@@ -1,5 +1,7 @@
 ### :warning: this app in currently in beta and does not fully support Bi-sync classes (they may work though)
 # SFSU Auto Scheduler
+
+_Make an issue if you have any problems and I will fix it asap_
 https://chrome.google.com/webstore/detail/sfsu-scheduler/kcdjjkdoipjipflpjkggcpmffkoickbc
 This is a multi-platform web extension that allows students at San Francisco State University to easily figure out what is the best class to pick.
 ### Tutorial 
